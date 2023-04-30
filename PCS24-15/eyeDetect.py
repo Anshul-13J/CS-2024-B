@@ -8,13 +8,7 @@ import time
 
 isDrowsy = False
 config = {
-    "apiKey": "AIzaSyA8qt2qq_Knpp4nOUVcBgSYueOwRKCSlfc",
-    "authDomain": "test-6cdd9.firebaseapp.com",
-    "databaseURL": "https://test-6cdd9-default-rtdb.firebaseio.com",
-    "projectId": "test-6cdd9",
-    "storageBucket": "test-6cdd9.appspot.com",
-    "messagingSenderId": "830231640135",
-    "appId": "1:830231640135:web:b64f2c232c5cdcb5fd5962",
+//CONFIEDNTIAL
 }
 firebase = pyrebase.initialize_app(config)
 database = firebase.database()
