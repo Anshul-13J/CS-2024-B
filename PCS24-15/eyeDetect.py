@@ -1,3 +1,5 @@
+# Importing the necessary libraries
+
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
@@ -6,7 +8,10 @@ import pyrebase
 from datetime import datetime
 import time
 
+# Variable telling the drowsiness status
 isDrowsy = False
+
+# Connecting to the realtime-Firebase
 config = {
     "apiKey": "AIzaSyA8qt2qq_Knpp4nOUVcBgSYueOwRKCSlfc",
     "authDomain": "test-6cdd9.firebaseapp.com",
@@ -19,6 +24,8 @@ config = {
 firebase = pyrebase.initialize_app(config)
 database = firebase.database()
 
+
+# Function to calculate the open length of the eye
 def open_len(arr):
     y_arr = []
 
@@ -30,12 +37,13 @@ def open_len(arr):
 
     return max_y - min_y
 
-mp_face_mesh = mp.solutions.face_mesh
 
+# Defining face mesh to calculate the drowisness status
+mp_face_mesh = mp.solutions.face_mesh
 RIGHT_EYE = [ 362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385,384, 398 ]
 LEFT_EYE = [ 33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161 , 246 ]
 # arduino = SerialObject()
-start_time = time.time()
+start_time = time.time()                #Data is logged every 10 seconds, so it's is used to start the counter.
 cap = cv.VideoCapture(0)
 
 with mp_face_mesh.FaceMesh(
@@ -85,9 +93,9 @@ with mp_face_mesh.FaceMesh(
             cv.putText(img=frame, text='Max: ' + str(max_right)  + ' Right Eye: ' + str(len_right), fontFace=0, org=(10, 50), fontScale=0.5, color=(0, 255, 0))
 
             if (len_left <= int(max_left / 2) + 1 and len_right <= int(max_right / 2) + 1):
-                drowsy_frames += 1
+                drowsy_frames += 1                                                            # Increasing the count of Drowsy Frames
             else:
-                drowsy_frames = 0
+                drowsy_frames = 0                                                             # Resetting the count of Drowsy Frames
             if (drowsy_frames > 20):
                 isDrowsy = True
                 # arduino.sendData([2])
@@ -99,13 +107,20 @@ with mp_face_mesh.FaceMesh(
                 isDrowsy = False
 
            
-            if time.time() - start_time >= 10:
+            if time.time() - start_time >= 10:                                                # Logging data every 10 seconds
             # if True:
                 now = datetime.now()
+                ## READ THE SENSOR DATA
                 date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
                 data = {
                         "logStat" : date_time,
                         "isDrowsy": isDrowsy,
+                        "cabinTemperature": 28,
+                        "cargoTemperature" : 24,
+                        "isDrunk": False,
+                        "speed" : 56,
+                        "location": "27.5746998, 81.6079353",
+                        "drivingDuration_hrs" : 3.5,
                         "message" : "Take a Rest" if isDrowsy else "Going Good",
                 }
                 database.child("Drivers").child("Driver1").push(data)
